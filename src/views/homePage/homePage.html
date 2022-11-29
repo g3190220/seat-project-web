@@ -1,0 +1,240 @@
+<section class="app">
+  <template>
+    <v-container class="fill-height" fluid>
+      <!-- <v-row justify="center" align="center" v-if="!isSubmit"><img src="../../assets/classroom.png" width="90px" height="90px"></v-row> -->
+      <v-row justify="center" align="center" v-if="!isSubmit">
+        <v-col>
+          <v-btn 
+            class="ma-2"
+            color="cyan lighten-1"
+            dark
+            rounded
+            outlined
+            x-large
+            elevation="3"
+            @click="dialog=true"
+          >
+          設定座位表
+          </v-btn>
+        </v-col>
+        <v-col>
+          <v-btn
+          color="cyan lighten-1"
+          class="ma-2"
+          rounded
+          dark
+          outlined
+          x-large
+          :loading="isSelecting"
+          elevation="3"
+          @click="onButtonClick"
+        >
+          {{ buttonText }}
+        </v-btn>
+        <input
+          ref="uploader"
+          class="d-none"
+          type="file"
+          accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+          @change="onFileChanged"
+        >
+        </v-col>
+        <v-col>
+          <v-btn 
+          class="ma-2"
+          color="success"
+          dark
+          rounded
+          outlined
+          x-large
+          elevation="3"
+          @click="submit"
+        >
+          送出
+        </v-btn>
+        </v-col>
+      </v-row>
+      <v-row justify="center" align="center" v-if="isSubmit">
+        <div><img src="../../assets/success.png" width="30px" height="30px"></div>
+        <div><h2 style="color:rgb(25, 192, 78)"> 已成功下載座位表！</h2></div>
+      </v-row>
+    </v-container>
+  </template>
+  <v-dialog
+          v-model="dialog"
+          fullscreen
+          hide-overlay
+          transition="dialog-bottom-transition"
+          scrollable
+        >
+          
+          <v-card>
+              <v-card-title class="pa-0">
+                <v-toolbar color="blue-grey" dark flat>
+                  <v-toolbar-title>設定座位表</v-toolbar-title>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                      text
+                      @click="dialog = false"
+                  >
+                    返回
+                  </v-btn>
+                </v-toolbar>
+              </v-card-title>
+              <v-container fluid>
+                <v-row>
+                  <v-col><v-btn color="cyan lighten-1" dark @click="addClassRoom">新增教室</v-btn></v-col>
+                </v-row>
+                <v-row>
+                  <v-col>
+                    <v-data-table 
+                      :headers="headers" 
+                      :items="classRoom" 
+                      :items-per-page="5"
+                      :hide-default-footer="true"
+                      item-key="roomNo"
+                      class="elevation-1" 
+                      v-if="this.classRoom.length>0">
+                      <template v-slot:item.roomNo="{ item }">
+                        <template v-if="item.edit !== undefined && item.edit">
+                            <v-text-field
+                              solo
+                              dense
+                              class="align-center"
+                              :rules="[rules.required]"
+                              :hide-details="true"
+                              v-model="item.form.roomNo">
+                            </v-text-field>
+                        </template>
+                        <template v-else>
+                          {{item.roomNo}}
+                        </template>
+                      </template>
+                      <template v-slot:item.totalRow="{ item }">
+                        <template v-if="item.edit !== undefined && item.edit">
+                            <v-text-field
+                              solo
+                              dense
+                              class="align-center"
+                              type="number"
+                              :rules="[rules.required, rules.digits]"
+                              :hide-details="true"
+                              v-model="item.form.totalRow">
+                            </v-text-field>
+                        </template>
+                        <template v-else>
+                          {{item.totalRow}}
+                        </template>
+                      </template>
+                      <template v-slot:item.totalCol="{ item }">
+                        <template v-if="item.edit !== undefined && item.edit">
+                            <v-text-field
+                              solo
+                              dense
+                              class="align-center"
+                              type="number"
+                              :rules="[rules.required, rules.digits]"
+                              :hide-details="true"
+                              v-model="item.form.totalCol">
+                            </v-text-field>
+                        </template>
+                        <template v-else>
+                          {{item.totalCol}}
+                        </template>
+                      </template>
+                      <template v-slot:item.aisle="{ item }">
+                        <template v-if="item.edit !== undefined && item.edit">
+                            <v-text-field
+                              solo
+                              dense
+                              class="align-center"
+                              :hide-details="true"
+                              v-model="item.form.aisle">
+                            </v-text-field>
+                        </template>
+                        <template v-else>
+                          {{item.aisle}}
+                        </template>
+                      </template>
+                      <template v-slot:item.finalSeat="{ item }">
+                        <template v-if="item.edit !== undefined && item.edit">
+                            <v-text-field
+                              solo
+                              dense
+                              class="align-center"
+                              :hide-details="true"
+                              v-model="item.form.finalSeat">
+                            </v-text-field>
+                        </template>
+                        <template v-else>
+                          {{item.finalSeat}}
+                        </template>
+                      </template>
+                      <template v-slot:item.actions="{ item }">
+                        <template v-if="!edit">
+                          <v-btn icon small color="primary" @click="showDiagram(item)">
+                            <v-icon>mdi-eye</v-icon>
+                          </v-btn>
+                        </template>
+                        <template v-else-if="item.edit">
+                          <v-btn 
+                            icon 
+                            small 
+                            class='mr-1' 
+                            color="green"
+                            @click="confirmAddRoom(item)">
+                            <v-icon>mdi-check</v-icon>
+                          </v-btn>
+                          <v-btn icon small class='mr-1' color="red" @click="reset">
+                            <v-icon>mdi-close</v-icon>
+                          </v-btn>
+                        </template>
+                      </template>
+                  </v-data-table>
+                  </v-col>
+                </v-row>
+                <!-- <v-row class="ma-4" justify="center" align="center" v-if="isShowDiagram">
+                  <div>
+                    <ul v-for="(column, index) in matrix">
+                      <li 
+                        v-for="(item, index) in column" 
+                        :key="index"
+                        :class="bindClass(item)">
+                      {{ item.state }}
+                    </li>
+                    </ul>
+                  </div>
+                </v-row> -->
+              </v-container>
+          </v-card>
+  </v-dialog>
+  <v-dialog
+      v-model="isShowDiagram"
+  >
+    <v-card>
+      <!-- <v-card-actions>
+        <v-btn
+          color="green darken-1"
+          text
+          @click="isShowDiagram = false"
+        >
+          close
+        </v-btn>
+      </v-card-actions> -->
+      <v-container fluid>
+        <v-row class="ma-4" justify="center" align="center" >
+        <div>
+          <ul v-for="(column, index) in matrix">
+            <li 
+              v-for="(item, index) in column" 
+              :key="index"
+              :class="bindClass(item)">
+            {{ item.state }}
+          </li>
+          </ul>
+        </div>
+      </v-row>
+    </v-container>
+    </v-card>
+  </v-dialog>
+</section>

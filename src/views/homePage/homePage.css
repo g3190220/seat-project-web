@@ -1,0 +1,56 @@
+.v-btn {
+    width: 150px;
+    font-weight: bold;
+}
+.table { border-collapse: collapse; margin-top: 10px; }
+.td { width: 50px; height: 50px; border: 1px solid gray; font-size: 20pt;
+text-align: center; cursor: pointer; }
+
+.seat{
+    float: left;
+    width: 30px;
+    height: 30px;
+    margin: 8px 13px;
+    cursor: pointer;
+    list-style: none;
+}
+.seatActive{
+    float: left;
+    width: 30px;
+    height: 30px;
+    margin: 8px 13px;
+    cursor: pointer;
+    list-style: none;
+    background-color: rgb(17, 159, 17);
+}
+.seatAisle{
+    float: left;
+    width: 30px;
+    height: 30px;
+    margin: 8px 13px;
+    cursor: pointer;
+    list-style: none;
+    background-color: white;
+}
+.seatNoUse{
+    float: left;
+    width: 30px;
+    height: 30px;
+    margin: 8px 13px;
+    cursor: pointer;
+    list-style: none;
+    background-color: rgb(178, 175, 175);
+}
+
+.container.fill-height {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    background: url('../../assets/background.jpeg') no-repeat center center fixed !important;
+    background-size: cover;
+}
+
+.vdialognew {
+    background: url('../../assets/background.jpeg') no-repeat center center fixed !important;
+    background-size: cover;
+}

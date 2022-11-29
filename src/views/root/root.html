@@ -1,0 +1,15 @@
+<section class="app">
+    <v-app>
+      <homeHeader></homeHeader>
+      <v-main>
+        <v-container fluid fill-height>
+          <v-layout class="align-center justify-center">
+              <router-view
+                v-bind:key="'RouterView/'+$router.fullPath"
+              >
+              </router-view>
+          </v-layout>
+        </v-container>
+      </v-main>
+    </v-app>
+</section>
